@@ -1,8 +1,17 @@
 jaffle_shop:
-  target: dev
   outputs:
-    dev:
-      type: bigquery
+    prod:
+      location: europe-west2
       method: oauth
-      project: knative-atamel
-      dataset: dbt_atamel_dataset
+      project: data-sandbox-266217
+      schema: bsl
+      threads: 4
+      type: bigquery
+    sandbox_dev:
+      location: europe-west2
+      method: oauth
+      project: data-sandbox-266217
+      schema: dbt_bsl
+      threads: 4
+      type: bigquery
+  target: sandbox_dev

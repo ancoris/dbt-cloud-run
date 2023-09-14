@@ -1,11 +1,11 @@
 {
-  "apiVersion": "run.googleapis.com/v1",
+  "apiVersion": "run.googleapis.com/v1alpha1",
   "kind": "Job",
   "metadata": {
     "annotations": {
-      "run.googleapis.com/launch-stage": "GA"
+      "run.googleapis.com/launch-stage": "ALPHA"
     },
-    "name": "dbt-job2",
+    "name": "JOB_NAME",
     "namespace": "data-sandbox-266217"
   },
   "spec": {
@@ -14,7 +14,7 @@
       "spec": {
         "containers": [
           {
-            "image": "gcr.io/data-sandbox-266217/dbt-job2"
+            "image": "gcr.io/data-sandbox-266217/JOB_NAME"
           }
         ]
       }

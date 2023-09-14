@@ -102,7 +102,7 @@ gcloud services enable cloudbuild.googleapis.com
 Build the container:
 
 ```sh
-JOB_NAME=dbt-job
+JOB_NAME=dbt-job2
 PROJECT_ID=$(gcloud config get-value core/project)
 
 gcloud builds submit --tag gcr.io/$PROJECT_ID/$JOB_NAME
@@ -111,17 +111,17 @@ gcloud builds submit --tag gcr.io/$PROJECT_ID/$JOB_NAME
 To test, first create the job:
 
 ```sh
-REGION=europe-west1
+REGION=europe-west2
 gcloud config set run/region ${REGION}
 
-gcloud alpha run jobs create dbt-job \
+gcloud run jobs create $JOB_NAME \
   --image=gcr.io/$PROJECT_ID/$JOB_NAME
 ```
 
 Run the job:
 
 ```sh
-gcloud alpha run jobs run dbt-job
+gcloud run jobs execute $JOB_NAME
 ```
 
 You can see the progress of the execution:
@@ -161,17 +161,18 @@ Create a Cloud Scheduler job to call the service every day at 9:00:
 ```sh
 PROJECT_NUMBER="$(gcloud projects describe $(gcloud config get-value project) --format='value(projectNumber)')"
 
-gcloud scheduler jobs create http $JOB_NAME-run --schedule "0 9 * * *" \
+gcloud scheduler jobs create http $JOB_NAME-trigger --schedule "0 9 * * *" \
    --http-method=POST \
-   --uri=https://$REGION-run.googleapis.com/apis/run.googleapis.com/v1alpha1/namespaces/$PROJECT_ID/jobs \
+   --uri=https://$REGION-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/$PROJECT_ID/jobs/$JOB_NAME\:run \
    --oauth-service-account-email=$PROJECT_NUMBER-compute@developer.gserviceaccount.com \
-   --message-body-from-file=messagebody.json
+   --location=$REGION
 ```
+
 
 You can test that the service by manually invoking the job:
 
 ```sh
-gcloud scheduler jobs run $JOB_NAME-run
+gcloud scheduler jobs run $JOB_NAME-trigger --location=$REGION
 ```
 
 After a few seconds, you should see the dataset created with a new
