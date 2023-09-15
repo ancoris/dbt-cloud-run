@@ -1,0 +1,66 @@
+version: 2
+# comment out database and schema if not in EU processing region
+sources:
+  - name: london_santander
+    #database: bigquery-public-data
+    schema: london_bicycles_euw2
+    tables:
+      - name: cycle_stations
+        columns:
+          - name: id
+            tests:
+              - not_null
+              - unique
+
+          - name: installed
+
+          - name: latitude
+
+          - name: locked
+
+          - name: longitude
+
+          - name: name
+
+          - name: bikes_count
+
+          - name: docks_count
+
+          - name: nbEmptyDocks
+
+          - name: temporary
+
+          - name: terminal_name
+
+          - name: install_date
+
+          - name: removal_date
+
+      - name: cycle_hire
+        columns:
+          - name: rental_id
+            tests:
+              - not_null
+              - unique
+
+          - name: duration
+
+          - name: bike_id
+
+          - name: end_date
+
+          - name: end_station_id
+
+          - name: end_station_name
+
+          - name: start_date
+
+          - name: start_station_id
+
+          - name: start_station_name
+
+          - name: end_station_logical_terminal
+
+          - name: start_station_logical_terminal
+
+          - name: end_station_priority_id

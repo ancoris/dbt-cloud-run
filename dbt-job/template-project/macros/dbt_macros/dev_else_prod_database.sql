@@ -1,0 +1,1 @@
+{% macro dev_else_prod_database() %}{{ 'PROJECT-NAME-dev' if target.name == 'PROJECT_NAME_dev' else 'PROJECT-NAME' }}{% endmacro %}

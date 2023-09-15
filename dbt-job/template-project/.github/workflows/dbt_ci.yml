@@ -1,0 +1,85 @@
+name: dbt CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  # do not change
+  DBT_PROFILES_DIR: ./
+  DBT_GOOGLE_BIGQUERY_DATASET: dbt_pr_${{ github.event.pull_request.number }}
+  # change
+  GCS_ARTIFACTS_BUCKET: dbt_manifest_266217
+
+jobs:
+  run_dbt_ci:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: "Obtain run time"
+        run: |
+          echo "date=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+ 
+      - name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.STAGING_ENVIRONMENT_SERVICE_ACC }}'
+
+      - name: 'Setup Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      - name: Setup service account and profile files
+        run: |
+            echo '${{ secrets.STAGING_ENVIRONMENT_SERVICE_ACC }}' > service_account.json
+            echo '${{ secrets.PROFILES_YML }}' > profiles.yml
+        shell: bash
+        
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Copy Production manifest to local system
+        run: |
+          gsutil cp gs://$GCS_ARTIFACTS_BUCKET/latest/manifest.json .
+
+      - name: dbt deps
+        run: |
+          dbt deps
+          
+      # substitute dbt debug for dbt run and target - expand to control error output
+      - name: dbt build 
+        id: run
+        run: |
+          set -o pipefail
+          dbt build --select state:modified+ --defer --state . --target staging 2>&1 | tee dbt_build_output.txt
+          if [ $? -eq 0 ]
+            then
+              echo "DBT_RUN_STATE=passed" >> $GITHUB_ENV
+              echo "DBT run OK" >> dbt_build_output.txt
+            else
+              echo "DBT_RUN_STATE=failed" >> $GITHUB_ENV
+              echo "DBT run failed" >> dbt_build_output.txt
+              exit 1
+          fi

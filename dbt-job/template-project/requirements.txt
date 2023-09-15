@@ -1,0 +1,4 @@
+dbt-bigquery==1.5.1
+elementary-data[bigquery]
+sqlfluff==2.2.1
+sqlfluff-templater-dbt==2.2.1

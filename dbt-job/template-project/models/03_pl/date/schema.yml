@@ -1,0 +1,160 @@
+version: 2
+
+models:
+    - name: dim_date
+      description: Join on this table to add additional date complexity
+      columns:
+          - name: date_surrogate_key
+            description: Surrogate key, hash of date actual. e.g 57bf835442e2cf6f551f6c52639afc4c
+            tests:
+             - not_null
+             - unique
+          - name: date_actual
+            description: Natural key, calendar date, e.g. '2020-03-01'
+            tests:
+               - not_null
+               - unique
+          - name: year_day
+            description: Year and day number with D separator, e.g. '2020D61'
+            tests:
+               - not_null
+               - unique
+          - name: year_week
+            description: Year and week number with W separator, e.g. '2020W08'
+            tests:
+               - not_null
+          - name: year_month
+            description: Year and month number with M separator, e.g. '2020M03'
+            tests:
+               - not_null
+          - name: year_quarter
+            description: Year and quarter number with Q separator, e.g. '2020Q1'
+            tests:
+               - not_null
+          - name: day_of_month_no
+            description: Day of month number, e.g. 1
+            tests:
+               - not_null
+          - name: day_name_full
+            description: Name of the day, e.g. 'Saturday'
+            tests:
+               - not_null
+          - name: day_name_short
+            description: Shortened 3 char name of the day, e.g. 'Sat'
+            tests:
+               - not_null
+          - name: month_name_full
+            description: Nname of the month, e.g. 'March'
+            tests:
+               - not_null
+          - name: month_name_short
+            description: Shortened 3 char name of the month, e.g. 'Mar'
+            tests:
+               - not_null
+          - name: month_no
+            description: Month number within the year, e.g. 3
+            tests:
+               - not_null
+          - name: week_no
+            description: Week number within the year, e.g. 8
+            tests:
+               - not_null
+          - name: quarter_no
+            description: Quarter number within the year, e.g. 1
+            tests:
+               - not_null
+          - name: year_no
+            description: Year as YYYY, e.g. '2020'
+            tests:
+               - not_null
+          - name: century_no
+            description: Century number as CC, e.g. 20
+            tests:
+               - not_null
+          - name: first_day_of_week
+            description: Date of the first day of week (Monday), e.g. '2020-02-24'
+            tests:
+               - not_null
+          - name: first_day_of_month
+            description: Date of the first day of month, e.g. '2020-03-01'
+            tests:
+              - not_null
+          - name: first_day_of_quarter
+            description: Date of the first day of quarter, e.g. '2020-01-01'
+            tests:
+               - not_null
+          - name: first_day_of_year
+            description: Date of the first day of year, e.g. '2020-01-01'
+            tests:
+               - not_null
+          - name: last_day_of_week
+            description: Date of the last day of week (Sunday), e.g. '2020-03-01'
+            tests:
+               - not_null
+          - name: last_day_of_month
+            description: Date of the last day of month, e.g. '2020-03-31'
+            tests:
+               - not_null
+          - name: last_day_of_quarter
+            description: Date of the last day of quarter, e.g. '2020-03-31'
+            tests:
+               - not_null
+          - name: last_day_of_year
+            description: Date of the last day of year, e.g. '2020-12-31'
+            tests:
+               - not_null
+          - name: last_working_day_of_month
+            description: eg '2021-10-29'
+            tests:
+              - not_null
+          - name: last_working_day_of_quarter
+            description: eg '2021-10-29'
+            tests:
+              - not_null
+          - name: last_working_day_of_year
+            description: eg '2021-12-31'.
+            tests:
+              - not_null
+          - name: most_recent_working_day
+            description: eg '2022-02-04'
+            tests:
+              - not_null:
+                  config:
+                    severity: error
+                    error_if: ">1"
+          - name: day_of_week_no
+            description: Day number within week, e.g. 7
+            tests:
+               - not_null
+          - name: day_of_quarter_no
+            description: Day number within quarter, e.g. 61
+            tests:
+               - not_null
+          - name: day_of_year_no
+            description: Day number within year, e.g. 61
+            tests:
+              - not_null
+          - name: year_no_cumulative
+            description: Year number since earliest date, e.g. 120
+            tests:
+              - not_null
+          - name: quarter_no_cumulative
+            description: Quarter number since earliest date, e.g. 480
+            tests:
+              - not_null
+          - name: month_no_cumulative
+            description: Month number since earliest date, e.g. 1442
+            tests:
+              - not_null
+          - name: week_no_cumulative
+            description: Year number since earliest date, e.g. 6269
+            tests:
+              - not_null
+          - name: day_no_cumulative
+            description: Day number since earliest date, e.g. 43889
+            tests:
+              - not_null
+          - name: meta_process_time
+            description: Time when dim_date last built, e.g. '2020-03-03 10:59:35.649795 UTC'
+            tests:
+              - not_null

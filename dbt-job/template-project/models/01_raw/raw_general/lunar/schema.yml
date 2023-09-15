@@ -1,0 +1,26 @@
+version: 2
+
+seeds:
+    - name: lunar_cycles_dbt_seed
+      description: Lunar full moons between 1900 and 2050. Used to calc Easter in date_dim.
+      columns:
+          - name: full_moon_time
+            description: Full moon as timestamp e.g. '1900-01-15 08:07:30 pm'
+            tests:
+             - not_null
+          - name: full_moon_date
+            description: Full moon as date e.g. '1900-01-15'
+            tests:
+             - not_null
+          - name: is_total_eclipse
+            description: 1 if this is a total eclipse e.g. '1900-01-15'
+            tests:
+             - not_null
+          - name: is_partial_eclipse
+            description: 1 if this is a partial eclipse e.g. '1900-01-15'
+            tests:
+             - not_null
+          - name: region
+            description: Region, e.g. 'UK'
+            tests:
+             - not_null

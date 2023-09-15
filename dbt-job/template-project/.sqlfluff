@@ -1,0 +1,39 @@
+[sqlfluff]
+templater = dbt
+dialect = bigquery
+rules = L002,L005,L006,L010,L011,L012,L013,L014,L015,L017,L018,L019,L020,L021,L022,L023,L024,L025,L027,L030,L035,L036,L037,L038,L040,L041,L042,L044,L045,L046,L047,L049,L050,L051,L054,L055,L058,L060,L065,L066,L071
+ignore = parsing
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+
+[sqlfluff:rules:aliasing.table]
+aliasing = explicit
+
+[sqlfluff:rules:aliasing.column]
+aliasing = explicit
+
+[sqlfluff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:convention.select_trailing_comma]
+select_clause_trailing_comma = forbid
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = lower
+
+[sqlfluff:rules:ambiguous.join]
+fully_qualify_join_types = both
+
+[sqlfluff:rules:ambiguous.column_references]
+group_by_and_order_by_style = consistent
+
+[sqlfluff:rules:aliasing.length]
+min_alias_length = 3
+max_alias_length = 25
+
+[sqlfluff:templater:dbt]
+target = staging

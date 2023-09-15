@@ -1,0 +1,174 @@
+name: dbt run daily (global)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * *'
+  push:
+    branches:
+      - master
+    paths:
+      - 'models/**'
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+env:
+  # do not change
+  DBT_PROFILES_DIR: ./
+  DBT_GOOGLE_BIGQUERY_DATASET: dbt_placeholder_do_not_change
+  # change
+  GCS_ARTIFACTS_BUCKET: dbt_manifest_266217
+  GCP_PRODUCTION_PROJECT: data-sandbox-266217
+  ELEMENTARY_DATASET: dw_ci_prod_elementary
+
+jobs:
+  run_dbt:
+    if: github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: production
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: "Obtain run time"
+        run: |
+          echo "date=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+ 
+      - name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.PROD_ENVIRONMENT_SERVICE_ACC }}'
+
+      - name: 'Setup Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      - name: Setup service account and profile files
+        run: |
+            echo '${{ secrets.PROFILES_YML }}' > profiles.yml
+            echo '${{ secrets.PROD_ENVIRONMENT_SERVICE_ACC }}' > service_account.json
+        shell: bash
+
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: dbt deps
+        run: |
+          dbt deps
+
+      - name: dbt run (elementary pre run)
+        run: |
+          IS_ELEMENTARY_DATASET_EXIST=$(bq ls --max_results=10000 --project_id=$GCP_PRODUCTION_PROJECT | grep $ELEMENTARY_DATASET )
+          if [[ -z $IS_ELEMENTARY_DATASET_EXIST ]]; then
+              dbt run -s elementary --target prod
+          fi
+
+      - name: dbt build 
+        id: run
+        run: |
+          set -o pipefail
+          dbt build --exclude elementary --target prod 2>&1 | tee dbt_build_output.txt
+          if [ $? -eq 0 ]
+            then
+              echo "DBT_RUN_STATE=passed" >> $GITHUB_ENV
+              echo "DBT run OK" >> dbt_build_output.txt
+            else
+              echo "DBT_RUN_STATE=failed" >> $GITHUB_ENV
+              echo "DBT run failed" >> dbt_build_output.txt
+              exit 1
+          fi
+
+      - name: dbt build logs
+        if: (success() || failure()) && (steps.run.outcome == 'success' || steps.run.outcome == 'failure')
+        run: |
+          gsutil cp dbt_build_output.txt gs://$GCS_ARTIFACTS_BUCKET/$date/
+          gsutil cp dbt_build_output.txt gs://$GCS_ARTIFACTS_BUCKET/latest/
+
+      # docs are generated -- TODO add target
+      # may need to generate txt output for dbt docs - incase of failure
+      - name: generate dbt docs
+        id: docs
+        if: (success() || failure()) && (steps.run.outcome == 'success' || steps.run.outcome == 'failure')
+        run: |
+          dbt docs generate --target prod
+          mkdir -p docs_output/static
+          mv target/index.html docs_output/static
+          mv target/catalog.json docs_output/static
+          mv target/manifest.json docs_output/static
+          mv target/run_results.json docs_output/static
+
+      # dbtCloud only defferal state of manifest if all steps in the job were successful.
+      - name: Copy artifacts to GCS bucket
+        if: (success() || failure()) && (steps.docs.outcome == 'success' && steps.run.outcome == 'success')
+        run: |
+          gsutil cp ./docs_output/static/manifest.json gs://$GCS_ARTIFACTS_BUCKET/$date/
+          gsutil cp ./docs_output/static/manifest.json gs://$GCS_ARTIFACTS_BUCKET/latest/
+
+      - name: Deploy App Angine - dbt documentation
+        id: deploydocs
+        if: (success() || failure()) && (steps.docs.outcome == 'success')
+        run: |
+          echo '${{ secrets.APP_DEPLOY_YAML }}' > docs_output/app.yaml
+          cd docs_output
+          gcloud app deploy
+
+      # deletes versions except from the last 5.
+      - name: Clean up old docs - dbt documentation
+        if: (success() || failure()) && (steps.deploydocs.outcome == 'success')
+        run: |
+          versions=$(gcloud app versions list \
+            --service dbt-docs \
+            --sort-by '~VERSION.ID' \
+            --format 'value(VERSION.ID)' | sed 1,5d)
+          for version in $versions; do
+            gcloud app versions delete "$version" \
+              --service dbt-docs \
+              --quiet
+          done
+
+      - name: Deploy App Angine - dbt elementary
+        id: elementary
+        run: |
+          cd ${{ github.workspace }}
+          edr report --file-path "report.html" --profiles-dir "./" --env prod
+          mkdir -p docs_output_elementary/static
+          mv report.html docs_output_elementary/static
+          echo '${{ secrets.APP_DEPLOY_YAML_ELEMENTARY }}' > docs_output_elementary/app.yaml
+          cd docs_output_elementary
+          gcloud app deploy
+
+      # deletes versions except from the last 5.
+      - name: Clean up old docs - dbt elementary
+        if: (success() || failure()) && (steps.elementary.outcome == 'success')
+        run: |
+          versions=$(gcloud app versions list \
+            --service dbt-elementary \
+            --sort-by '~VERSION.ID' \
+            --format 'value(VERSION.ID)' | sed 1,5d)
+          for version in $versions; do
+            gcloud app versions delete "$version" \
+              --service dbt-elementary \
+              --quiet
+          done
+
+#      - name: Email alert on run failure
+#        if: failure()
+#        uses: fjogeleit/http-request-action@v1
+#        with:
+#          url: 'https://api.mailjet.com/v3.1/send'
+#          method: 'POST'
+#          username: ${{ secrets.MAILJET_PUBLIC }}
+#          password: ${{ secrets.MAILJET_PRIVATE }}
+#          customHeaders: '{"Content-Type": "application/json"}'
+#          data: '{"SandboxMode": false, "Messages":[{"From": {"Email": "noreply@ancoris.com", "Name": "Ancoris - Github Actions"}, "To": [{"Email": "tlangton@ancoris.com", "Name": "Thomas Langton"}], "Subject": "Github Actions: Failure on job ${{ github.job }} within ${{ github.repository }}", "TextPart": "Detailed logs can be found here: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", "Priority": 2}]}'
+                

@@ -1,0 +1,10 @@
+sandbox:
+  target: data_sandbox_dev
+  outputs:
+    data_sandbox_dev:
+      type: bigquery
+      method: oauth
+      project: data-sandbox-266217
+      dataset: dbt_YOURINITIALS
+      threads: 4
+      location: EU

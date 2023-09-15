@@ -102,7 +102,7 @@ gcloud services enable cloudbuild.googleapis.com
 Build the container:
 
 ```sh
-JOB_NAME=dbt-job2
+JOB_NAME=dbt-job3
 PROJECT_ID=$(gcloud config get-value core/project)
 
 gcloud builds submit --tag gcr.io/$PROJECT_ID/$JOB_NAME
@@ -112,10 +112,11 @@ To test, first create the job:
 
 ```sh
 REGION=europe-west2
-gcloud config set run/region ${REGION}
+gcloud config set run/region ${REGION
 
 gcloud run jobs create $JOB_NAME \
-  --image=gcr.io/$PROJECT_ID/$JOB_NAME
+  --image=gcr.io/$PROJECT_ID/$JOB_NAME \
+  --max-retries=0
 ```
 
 Run the job:

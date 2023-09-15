@@ -1,0 +1,47 @@
+name: 'dbt_project_template' # change in seeds section too
+version: '1.0.0'
+
+config-version: 2
+
+
+# Which context to use in profiles.yml
+profile: 'data-sandbox'
+
+
+# These configurations specify where dbt should look for different types of files
+# These don't typically change
+model-paths: ["models"]
+analysis-paths: ["analysis"]
+test-paths: ["tests"]
+seed-paths: ["data"]
+macro-paths: ["macros"]
+
+
+# These don't typically change
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
+    - "target"
+    - "dbt_packages"
+
+
+# Model configuration
+seeds:
+  dbt_project_template: # CHANGE THIS!
+    project: "{{ 'data-sandbox-266217' if target.name == 'prod' else ('data-sandbox-stage-266217' if target.name == 'staging' else 'data-sandbox-dev-266217') }}"
+    +enabled: true
+    +schema: raw_general
+    +column_types:
+      meta_delivery_time: timestamp
+    post-hook: "update {{ this }} set meta_delivery_time = {{meta_process_time()}} where meta_delivery_time is null"
+
+
+models:
+  project: "{{ 'data-sandbox-266217' if target.name == 'prod' else ('data-sandbox-stage-266217' if target.name == 'staging' else 'data-sandbox-dev-266217') }}"
+  +persist_docs:
+    relation: true
+    columns: true
+  +hours_to_expiration: "{{ None if target.name == 'prod' else 720 }}" # expire non prod objects.
+
+  elementary:
+    +schema: "elementary"
+    enabled: "{{ target.name == 'prod' and false }}"

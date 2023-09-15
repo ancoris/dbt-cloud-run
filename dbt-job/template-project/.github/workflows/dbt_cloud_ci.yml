@@ -1,0 +1,38 @@
+name: Staging DWH - dbt Cloud
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+
+
+env:
+  DBT_CLOUD_ACCOUNT_ID: 12345
+  DBT_CLOUD_JOB_ID: 12345
+
+jobs:
+  pr_on_master:
+    if: false # Set to true to enable this job!
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-cloud-cli
+      - name: Execute dbt Cloud job
+        run: |
+          dbt-cloud job run \
+            --api-token="${{ secrets.dbt_cloud_api_key }}" \
+            --git-sha="${{ github.event.pull_request.head.sha }}" \
+            --schema-override="dbt_cloud_pr_${{ github.event.pull_request.number }}" \
+            --wait
+        shell: bash

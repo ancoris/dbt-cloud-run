@@ -1,0 +1,17 @@
+data-sandbox:
+  outputs:
+    prod:
+      location: europe-west2
+      method: oauth
+      project: data-sandbox-266217
+      schema: dbt_bsl
+      threads: 4
+      type: bigquery
+    sandbox_dev:
+      location: europe-west2
+      method: oauth
+      project: data-sandbox-266217
+      schema: dbt_bsl
+      threads: 4
+      type: bigquery
+  target: prod
