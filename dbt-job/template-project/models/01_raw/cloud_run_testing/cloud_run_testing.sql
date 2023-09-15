@@ -5,6 +5,8 @@
     )
 }}
 
+-- trivial commit
+
 select 
          
   {% if is_incremental() %}
