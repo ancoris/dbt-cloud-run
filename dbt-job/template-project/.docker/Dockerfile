@@ -3,5 +3,6 @@ USER root
 WORKDIR /dbt
 COPY .docker/dbt_job_commands.sh ./
 COPY * ./
+COPY . ./
 
 ENTRYPOINT "./dbt_job_commands.sh" 

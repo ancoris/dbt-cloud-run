@@ -5,5 +5,3 @@ COPY .docker/dbt_job_commands.sh ./
 COPY * ./
 
 ENTRYPOINT "./dbt_job_commands.sh" 
-
-.docker/dbt_job_commands.sh
