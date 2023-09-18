@@ -1,0 +1,9 @@
+steps:
+  - name: docker
+    args:
+      - build
+      - --tag=gcr.io/${_PROJECT_ID}/${_JOB_NAME}
+      - --file=./.docker/Dockerfile
+      - .
+images:
+  - gcr.io/${_PROJECT_ID}/${_JOB_NAME}
