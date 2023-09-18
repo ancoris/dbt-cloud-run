@@ -7,3 +7,6 @@ steps:
       - .
 images:
   - gcr.io/${_PROJECT_ID}/${_JOB_NAME}
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+  _JOB_NAME: dbt-job3
