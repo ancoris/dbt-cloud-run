@@ -1,0 +1,27 @@
+{
+  "displayName": "Cloud Run Job Error (APIv02)",
+  "documentation": {
+    "content": "A [Cloud Run Job](https://console.cloud.google.com/run/jobs?project=MYPROJECT&supportedpurview=project) has errored. Check the UI for which, then associated logs for details. Highly likely that it is a dbt error.",
+    "mimeType": "text/markdown"
+  },
+  "userLabels": {},
+  "conditions": [
+    {
+      "displayName": "Log match condition",
+      "conditionMatchedLog": {
+        "filter": "resource.type=\"cloud_run_job\"\nresource.labels.location=\"MYREGION\"\nresource.labels.project_id=\"MYPROJECT\"\nseverity>=ERROR\nprotoPayload.status.message=~\"^Execution\""
+      }
+    }
+  ],
+  "alertStrategy": {
+    "notificationRateLimit": {
+      "period": "900s"
+    },
+    "autoClose": "259200s"
+  },
+  "combiner": "OR",
+  "enabled": true,
+  "notificationChannels": [
+    "projects/MYPROJECT/notificationChannels/MYNOTIFICATIONCHANNEL"
+  ]
+}
