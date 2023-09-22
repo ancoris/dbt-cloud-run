@@ -5,4 +5,4 @@ USER root
 WORKDIR /dbt
 COPY . ./
 
-CMD "./.docker/dbt_job_commands.sh" 
+CMD "sh .docker/dbt_job_commands.sh" 
