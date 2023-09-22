@@ -1,5 +1,7 @@
 steps:
   - name: docker
+    env:
+    - 'GCS_ARTIFACTS_BUCKET=data-sandbox-266217-misc-data'
     args:
       - build
       - --tag=gcr.io/${_PROJECT_ID}/${_JOB_NAME}
