@@ -5,4 +5,5 @@ USER root
 WORKDIR /dbt
 COPY . ./
 
-ENTRYPOINT "./.docker/dbt_job_commands.sh" 
+ENTRYPOINT "sh "
+CMD "./.docker/dbt_job_commands.sh" 
