@@ -1,2 +1,0 @@
-Bespoke written dbt tests go in this folder.
-This text file exists to force GitHub to sync, as it will ignore empty folders.
