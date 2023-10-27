@@ -1,0 +1,68 @@
+# implementation of grid. ging to try columns next.
+    body=
+    {
+      'cardsV2': [{
+        'cardId': 'createCardMessage',
+        'card': {
+          'sections': [
+            {
+              'widgets': [
+                {
+                  "textParagraph": {
+                    "text": "<b><font color=\"#f00a0a\">Failed</font></b> \n PLACEHOLDER JOB NAME"
+                  }
+                },
+                {
+                  "divider": {}
+                },
+                {
+                  "grid": {
+                    "title": "repository",
+                    "columnCount": 2,
+                    "borderStyle": {
+                      "type": "STROKE",
+                      "cornerRadius": 4.0
+                    },
+                    "items": [
+                      {
+                        "title": "ancoris etc",
+                        "textAlignment": "CENTER",
+                        "layout": "TEXT_BELOW"
+                      },
+                      {
+                        "title": "Another item",
+                        "textAlignment": "CENTER",
+                      }
+                    ],
+                    "onClick": {
+                      "openLink": {
+                        "url": "https://developers.google.com/chat"
+                      }
+                    }
+                  }
+                },
+                {
+                  "divider": {}
+                },
+                {
+                  'buttonList': {
+                    'buttons': [
+                      {
+                        'text': 'Go to job history',
+                        'onClick': {
+                          'openLink': {
+                            'url': 'https://console.cloud.google.com/run/jobs/details/europe-west2/dbt-daily-job4/executions'
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },                
+              ]
+            },
+
+
+          ]
+        }
+      }]
+    }

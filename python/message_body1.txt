@@ -1,0 +1,53 @@
+# Basic
+body=
+{
+  'cardsV2': [{
+    'cardId': 'createCardMessage',
+    'card': {
+      'sections': [
+        {
+          'widgets': [
+            {
+              "textParagraph": {
+                "text": "<b><font color=\"#80e27e\">Succeeded</font></b> \n PLACEHOLDER JOB NAME"
+              }
+            },
+
+            {
+              "divider": {}
+            },
+            {
+              "textParagraph": {
+                "text": "This is a text paragraph. It supports simple HTML text formatting, like <b>bold</b>, <font color='#ea9999'>color</font>, and <a href='https://www.google.com'>hyperlinks</a>."
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "Text paragraphs also support <i>italics</i>, <u>underlining</u>, and <s>strikethrough</s>."
+              }
+            },
+                            {
+              "divider": {}
+            },
+            {
+              'buttonList': {
+                'buttons': [
+                  {
+                    'text': 'Go to job history',
+                    'onClick': {
+                      'openLink': {
+                        'url': 'https://console.cloud.google.com/run/jobs/details/europe-west2/dbt-daily-job4/executions'
+                      }
+                    }
+                  }
+                ]
+              }
+            },                
+          ]
+        },
+
+
+      ]
+    }
+  }]
+}

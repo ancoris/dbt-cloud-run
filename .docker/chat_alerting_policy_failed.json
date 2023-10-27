@@ -1,9 +1,5 @@
 {
-  "displayName": "Cloud Run Job Error (APIv02)",
-  "documentation": {
-    "content": "A [Cloud Run Job](https://console.cloud.google.com/run/jobs?project=MYPROJECT&supportedpurview=project) has errored. Check the UI for which, then associated logs for details. Highly likely that it is a dbt error.",
-    "mimeType": "text/markdown"
-  },
+  "displayName": "Cloud Run Job Failed (Chat)",
   "userLabels": {},
   "conditions": [
     {
@@ -15,9 +11,9 @@
   ],
   "alertStrategy": {
     "notificationRateLimit": {
-      "period": "900s"
+      "period": "300s"
     },
-    "autoClose": "259200s"
+    "autoClose": "1800s"
   },
   "combiner": "OR",
   "enabled": true,

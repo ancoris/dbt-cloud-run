@@ -1,6 +1,5 @@
 {
   "displayName": "notification_email_here@ancoris.com",
-  "enabled": true,
   "labels": {
     "email_address": "notification_email_here@ancoris.com"
   },

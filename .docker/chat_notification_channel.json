@@ -1,0 +1,8 @@
+{
+  "displayName": "Shared Asset Notifications",
+  "description": "Routed to cloud function in shared assets, through to google chat",
+  "labels": {
+    "topic": "projects/data-shared-assets/topics/cloud_run_notification_topic"
+  },
+  "type": "pubsub"
+}
